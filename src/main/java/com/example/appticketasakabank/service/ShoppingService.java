@@ -1,5 +1,6 @@
 package com.example.appticketasakabank.service;
 
+import com.example.appticketasakabank.model.dto.CancelShoppingDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,9 @@ import com.example.appticketasakabank.repository.SeanceRepository;
 import com.example.appticketasakabank.repository.SeatRepository;
 import com.example.appticketasakabank.repository.ShoppingRepository;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -90,9 +94,34 @@ public class ShoppingService {
         return new RestApiResponse("Seat successfully shopping", true);
     }
 
-    public List<Shopping> shoppingList() {
-        List<Shopping> list = shoppingRepository.findAll();
-        return list;
+    public RestApiResponse cancelled(Long id, CancelShoppingDto cancelShoppingDto) {
+        Optional<Shopping> optionalShopping = shoppingRepository.findById(id);
+        if (optionalShopping.isPresent()) {
+            Shopping shopping = optionalShopping.get();
+            Date date = shopping.getCreatedAt();
+            Date currentDate = new Date();
+            if (shopping.getShoppingStatus() == ShoppingStatus.PAYED) {
+                if (date.before(currentDate)) {
+                    shopping.setShoppingStatus(ShoppingStatus.FREE);
+                }
+                Optional<Seat> optionalSeat = seatRepository.findById(cancelShoppingDto.getSeat_id());
+                if (optionalSeat.isPresent()) {
+                    Seat seat = optionalSeat.get();
+                    seat.setSeatStatus(SeatStatus.FREE);
+                }
+                return new RestApiResponse("Seat not fount", false);
+
+            }
+        } else {
+            return new RestApiResponse("Shopping not found", false);
+        }
+        return new RestApiResponse("Shopping cancalled", true);
     }
+
+    public List<Shopping> shoppingList() {
+        List<Shopping> shoppingList = shoppingRepository.findAll();
+        return shoppingList;
+    }
+
 
 }
