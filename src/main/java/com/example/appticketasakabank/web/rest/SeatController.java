@@ -1,5 +1,6 @@
 package com.example.appticketasakabank.web.rest;
 
+import com.example.appticketasakabank.model.dto.SeatLoopDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,12 @@ public class SeatController {
     public ResponseEntity<?> create(@RequestBody SeatDTO seatDTO) {
         RestApiResponse apiResponse = seatService.create(seatDTO);
         return ResponseEntity.status(201).body(apiResponse);
+    }
+
+    @PostMapping("/seat-loop")
+    public ResponseEntity<?> createSeatLoop(@RequestBody SeatLoopDTO seatLoopDTO) {
+        RestApiResponse seatLoop = seatService.createSeatLoop(seatLoopDTO);
+        return ResponseEntity.status(201).body(seatLoop);
     }
 
     @GetMapping("/seats")
